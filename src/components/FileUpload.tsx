@@ -6,11 +6,11 @@ import { Button } from "./ui/button";
 
 interface FileUploadProps {
   onFilesProcessed: (files: Array<{ filename: string; columns: string[]; rows: any[] }>) => void;
-  spreadsheetCount: number;
-  onClear: () => void;
+  spreadsheets: Array<{ filename: string; columns: string[]; rows: any[] }>;
+  onRemove: (index: number) => void;
 }
 
-export const FileUpload = ({ onFilesProcessed, spreadsheetCount, onClear }: FileUploadProps) => {
+export const FileUpload = ({ onFilesProcessed, spreadsheets, onRemove }: FileUploadProps) => {
   const processFile = useCallback(
     async (file: File) => {
       try {
@@ -95,11 +95,11 @@ export const FileUpload = ({ onFilesProcessed, spreadsheetCount, onClear }: File
   );
 
   return (
-    <div className="w-full flex gap-2 items-center">
+    <div className="w-full space-y-2">
       <div
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
-        className="flex-1 border border-dashed border-border rounded-lg px-4 py-2 text-center hover:border-primary/50 transition-colors cursor-pointer bg-card/30 backdrop-blur-sm"
+        className="border border-dashed border-border rounded-lg px-4 py-2 text-center hover:border-primary/50 transition-colors cursor-pointer bg-card/30 backdrop-blur-sm"
       >
         <input
           type="file"
@@ -119,24 +119,40 @@ export const FileUpload = ({ onFilesProcessed, spreadsheetCount, onClear }: File
                 Enviar planilhas
               </p>
               <p className="text-xs text-muted-foreground">
-                {spreadsheetCount > 0 
-                  ? `${spreadsheetCount} ${spreadsheetCount === 1 ? 'carregada' : 'carregadas'}`
-                  : '.csv, .xls, .xlsx'}
+                .csv, .xls, .xlsx
               </p>
             </div>
           </div>
         </label>
       </div>
-      {spreadsheetCount > 0 && (
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={onClear}
-          className="h-10 w-10 shrink-0"
-          title="Limpar planilhas"
-        >
-          <X className="h-4 w-4" />
-        </Button>
+      
+      {spreadsheets.length > 0 && (
+        <div className="space-y-1.5">
+          {spreadsheets.map((spreadsheet, index) => (
+            <div 
+              key={index}
+              className="flex items-center gap-2 bg-card/50 rounded-lg px-3 py-2 border border-border/50"
+            >
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground truncate">
+                  {spreadsheet.filename}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {spreadsheet.rows.length} {spreadsheet.rows.length === 1 ? 'linha' : 'linhas'}
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onRemove(index)}
+                className="h-8 w-8 shrink-0 hover:bg-destructive/10 hover:text-destructive"
+                title={`Remover ${spreadsheet.filename}`}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

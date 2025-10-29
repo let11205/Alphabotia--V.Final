@@ -39,9 +39,10 @@ const Index = () => {
     setSpreadsheets((prev) => [...prev, ...newFiles]);
   };
 
-  const handleClearSpreadsheets = () => {
-    setSpreadsheets([]);
-    toast.success("Planilhas removidas");
+  const handleRemoveSpreadsheet = (index: number) => {
+    const removed = spreadsheets[index];
+    setSpreadsheets((prev) => prev.filter((_, i) => i !== index));
+    toast.success(`${removed.filename} removida`);
   };
 
   const streamChat = async (userMessage: string) => {
@@ -223,8 +224,8 @@ const Index = () => {
           <div className="max-w-3xl mx-auto space-y-1.5">
             <FileUpload 
               onFilesProcessed={handleFilesProcessed}
-              spreadsheetCount={spreadsheets.length}
-              onClear={handleClearSpreadsheets}
+              spreadsheets={spreadsheets}
+              onRemove={handleRemoveSpreadsheet}
             />
             <ChatInput onSend={handleSendMessage} disabled={isTyping} />
           </div>
