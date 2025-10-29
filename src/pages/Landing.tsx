@@ -52,7 +52,7 @@ const Landing = () => {
               </div>
               <CardTitle>Insights Incríveis</CardTitle>
               <CardDescription>
-                Análises profundas e visualizações impactantes
+                Insights personalizados para o seu negócio
               </CardDescription>
             </CardHeader>
           </Card>
