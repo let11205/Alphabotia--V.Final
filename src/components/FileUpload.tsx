@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { Upload, X } from "lucide-react";
+import { Upload, X, FileSpreadsheet } from "lucide-react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import { Button } from "./ui/button";
@@ -95,61 +95,60 @@ export const FileUpload = ({ onFilesProcessed, spreadsheets, onRemove }: FileUpl
   );
 
   return (
-    <div className="w-full space-y-2">
+    <div className="w-full space-y-1.5">
+      {/* Upload Area - Compacto */}
       <div
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
-        className="border border-dashed border-border rounded-lg px-4 py-2 text-center hover:border-primary/50 transition-colors cursor-pointer bg-card/30 backdrop-blur-sm"
+        className="border border-dashed border-border rounded-lg px-3 py-1.5 hover:border-primary/50 transition-colors cursor-pointer bg-card/30 backdrop-blur-sm"
       >
         <input
           type="file"
-          id="file-upload"
+          id="spreadsheet-upload"
           className="hidden"
-          accept=".csv,.xlsx,.xls"
+          accept=".csv,.xls,.xlsx"
           multiple
           onChange={handleFileInput}
         />
-        <label htmlFor="file-upload" className="cursor-pointer">
-          <div className="flex items-center justify-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-gradient-primary/10 flex items-center justify-center shrink-0">
-              <Upload className="h-4 w-4 text-primary" />
-            </div>
-            <div className="flex-1 text-left">
-              <p className="text-sm font-medium text-foreground">
-                Enviar planilhas
-              </p>
-              <p className="text-xs text-muted-foreground">
-                .csv, .xls, .xlsx
-              </p>
-            </div>
+        <label
+          htmlFor="spreadsheet-upload"
+          className="flex items-center gap-2 cursor-pointer"
+        >
+          <Upload className="h-4 w-4 text-muted-foreground shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-medium text-foreground truncate">
+              Enviar planilhas
+            </p>
           </div>
+          <p className="text-xs text-muted-foreground shrink-0">
+            .csv, .xlsx
+          </p>
         </label>
       </div>
       
+      {/* Lista de planilhas - Compacta com scroll horizontal */}
       {spreadsheets.length > 0 && (
-        <div className="space-y-1.5">
+        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-thin">
           {spreadsheets.map((spreadsheet, index) => (
             <div 
               key={index}
-              className="flex items-center gap-2 bg-card/50 rounded-lg px-3 py-2 border border-border/50"
+              className="flex items-center gap-1.5 bg-card/50 rounded-md px-2 py-1 border border-border/50 shrink-0 group hover:border-border transition-colors"
             >
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">
-                  {spreadsheet.filename}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {spreadsheet.rows.length} {spreadsheet.rows.length === 1 ? 'linha' : 'linhas'}
-                </p>
+              <div className="flex items-center gap-1.5 min-w-0">
+                <FileSpreadsheet className="h-3 w-3 text-muted-foreground shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-foreground truncate max-w-[120px]" title={spreadsheet.filename}>
+                    {spreadsheet.filename}
+                  </p>
+                </div>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
+              <button
                 onClick={() => onRemove(index)}
-                className="h-8 w-8 shrink-0 hover:bg-destructive/10 hover:text-destructive"
+                className="h-4 w-4 shrink-0 rounded-sm hover:bg-destructive/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 title={`Remover ${spreadsheet.filename}`}
               >
-                <X className="h-4 w-4" />
-              </Button>
+                <X className="h-3 w-3 text-destructive" />
+              </button>
             </div>
           ))}
         </div>
