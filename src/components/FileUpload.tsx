@@ -95,12 +95,12 @@ export const FileUpload = ({ onFilesProcessed, spreadsheets, onRemove }: FileUpl
   );
 
   return (
-    <div className="w-full space-y-1.5">
+    <div className="w-full space-y-2">
       {/* Upload Area - Compacto */}
       <div
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
-        className="border border-dashed border-border rounded-lg px-3 py-1.5 hover:border-primary/50 transition-colors cursor-pointer bg-card/30 backdrop-blur-sm"
+        className="border border-dashed border-border rounded-lg px-4 py-2.5 hover:border-primary/50 transition-colors cursor-pointer bg-card/30 backdrop-blur-sm"
       >
         <input
           type="file"
@@ -112,11 +112,11 @@ export const FileUpload = ({ onFilesProcessed, spreadsheets, onRemove }: FileUpl
         />
         <label
           htmlFor="spreadsheet-upload"
-          className="flex items-center gap-2 cursor-pointer"
+          className="flex items-center gap-3 cursor-pointer"
         >
-          <Upload className="h-4 w-4 text-muted-foreground shrink-0" />
+          <Upload className="h-5 w-5 text-muted-foreground shrink-0" />
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-foreground truncate">
+            <p className="text-sm font-medium text-foreground truncate">
               Enviar planilhas
             </p>
           </div>
@@ -128,26 +128,26 @@ export const FileUpload = ({ onFilesProcessed, spreadsheets, onRemove }: FileUpl
       
       {/* Lista de planilhas - Compacta com scroll horizontal */}
       {spreadsheets.length > 0 && (
-        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-thin">
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
           {spreadsheets.map((spreadsheet, index) => (
             <div 
               key={index}
-              className="flex items-center gap-1.5 bg-card/50 rounded-md px-2 py-1 border border-border/50 shrink-0 group hover:border-border transition-colors"
+              className="flex items-center gap-2 bg-card/50 rounded-lg px-3 py-2 border border-border/50 shrink-0 group hover:border-border transition-colors"
             >
-              <div className="flex items-center gap-1.5 min-w-0">
-                <FileSpreadsheet className="h-3 w-3 text-muted-foreground shrink-0" />
+              <div className="flex items-center gap-2 min-w-0">
+                <FileSpreadsheet className="h-4 w-4 text-muted-foreground shrink-0" />
                 <div className="min-w-0">
-                  <p className="text-xs font-medium text-foreground truncate max-w-[120px]" title={spreadsheet.filename}>
+                  <p className="text-sm font-medium text-foreground truncate max-w-[140px]" title={spreadsheet.filename}>
                     {spreadsheet.filename}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => onRemove(index)}
-                className="h-4 w-4 shrink-0 rounded-sm hover:bg-destructive/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                className="h-5 w-5 shrink-0 rounded-sm hover:bg-destructive/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                 title={`Remover ${spreadsheet.filename}`}
               >
-                <X className="h-3 w-3 text-destructive" />
+                <X className="h-3.5 w-3.5 text-destructive" />
               </button>
             </div>
           ))}
