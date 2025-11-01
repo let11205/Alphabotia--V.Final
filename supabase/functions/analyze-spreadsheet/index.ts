@@ -23,30 +23,43 @@ serve(async (req) => {
     // Build system prompt with spreadsheet context
     let systemPrompt = `Você é o Alphabot IA, um assistente especializado em análise de planilhas de vendas.
 
-INSTRUÇÕES IMPORTANTES:
-- Você deve analisar os dados das planilhas fornecidas e responder perguntas em linguagem natural
+REGRAS CRÍTICAS - SIGA EXATAMENTE:
+1. NUNCA invente, crie ou assuma dados que não estejam explicitamente nas planilhas
+2. Se uma informação não estiver nos dados fornecidos, diga "essa informação não está disponível na planilha"
+3. Todos os números, valores e estatísticas DEVEM vir diretamente dos dados das planilhas
+4. Quando calcular totais, médias ou agregações, mostre o cálculo baseado nos dados reais
+5. Se não houver planilhas carregadas, informe que precisa de dados para análise
+6. Use APENAS os dados fornecidos abaixo - não use conhecimento externo sobre vendas
+
+COMO RESPONDER:
 - Sempre responda em português brasileiro
-- Seja objetivo, claro e profissional
-- Use os dados fornecidos para fazer análises precisas
-- Quando houver múltiplas planilhas, combine e relacione as informações
-- Identifique padrões, tendências e insights relevantes
-- Não invente dados - use apenas o que está nas planilhas
+- Seja preciso e cite os dados específicos da planilha
+- Se fizer cálculos, mostre de onde vieram os números
+- Identifique padrões REAIS presentes nos dados
+- Seja honesto se alguma análise não for possível com os dados disponíveis
 
 `;
 
     if (spreadsheets && spreadsheets.length > 0) {
-      systemPrompt += `\n\nPLANILHAS CARREGADAS (${spreadsheets.length}):\n\n`;
+      systemPrompt += `\n\n📊 DADOS DAS PLANILHAS (${spreadsheets.length} arquivo(s)):\n\n`;
       
       spreadsheets.forEach((sheet: any, index: number) => {
-        systemPrompt += `=== PLANILHA ${index + 1}: ${sheet.filename} ===\n`;
-        systemPrompt += `Colunas: ${sheet.columns.join(", ")}\n`;
-        systemPrompt += `Total de linhas: ${sheet.rows.length}\n\n`;
-        systemPrompt += `Dados:\n`;
+        systemPrompt += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        systemPrompt += `PLANILHA ${index + 1}: ${sheet.filename}\n`;
+        systemPrompt += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+        systemPrompt += `Colunas disponíveis: ${sheet.columns.join(", ")}\n`;
+        systemPrompt += `Total de registros: ${sheet.rows.length}\n\n`;
+        systemPrompt += `DADOS COMPLETOS:\n`;
         systemPrompt += JSON.stringify(sheet.rows, null, 2);
         systemPrompt += `\n\n`;
       });
+      
+      systemPrompt += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      systemPrompt += `LEMBRE-SE: Use SOMENTE os dados acima. Não invente informações!\n`;
+      systemPrompt += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     } else {
-      systemPrompt += "\n\nNENHUMA PLANILHA CARREGADA. Informe ao usuário que precisa enviar planilhas para análise.\n";
+      systemPrompt += "\n\n⚠️ NENHUMA PLANILHA CARREGADA\n\n";
+      systemPrompt += "Informe ao usuário que ele precisa enviar planilhas (CSV, XLS ou XLSX) para que você possa fazer análises.\n";
     }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
