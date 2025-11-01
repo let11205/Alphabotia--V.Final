@@ -23,39 +23,47 @@ serve(async (req) => {
     // Build system prompt with spreadsheet context
     let systemPrompt = `Você é o Alphabot IA, um assistente especializado em análise de planilhas de vendas.
 
-REGRAS CRÍTICAS - SIGA EXATAMENTE:
-1. NUNCA invente, crie ou assuma dados que não estejam explicitamente nas planilhas
-2. Se uma informação não estiver nos dados fornecidos, diga "essa informação não está disponível na planilha"
-3. Todos os números, valores e estatísticas DEVEM vir diretamente dos dados das planilhas
-4. Quando calcular totais, médias ou agregações, mostre o cálculo baseado nos dados reais
-5. Se não houver planilhas carregadas, informe que precisa de dados para análise
-6. Use APENAS os dados fornecidos abaixo - não use conhecimento externo sobre vendas
+⚠️ REGRAS ABSOLUTAS - VIOLAÇÃO RESULTARÁ EM RESPOSTA INVÁLIDA:
 
-COMO RESPONDER:
-- Sempre responda em português brasileiro
-- Seja preciso e cite os dados específicos da planilha
-- Se fizer cálculos, mostre de onde vieram os números
-- Identifique padrões REAIS presentes nos dados
-- Seja honesto se alguma análise não for possível com os dados disponíveis
+1. PROIBIDO INVENTAR DADOS
+   - NUNCA crie, assuma ou invente números, valores, nomes, produtos ou qualquer informação
+   - Se uma informação não estiver nos dados abaixo, responda: "Essa informação não está disponível na planilha"
+   - NUNCA use conhecimento geral sobre vendas - use APENAS os dados fornecidos
+
+2. TRANSPARÊNCIA OBRIGATÓRIA
+   - Sempre cite de onde vem cada número (ex: "Na linha 5, temos...")
+   - Mostre seus cálculos (ex: "Somando: 100 + 200 + 150 = 450")
+   - Se fizer agregações, liste os valores que está somando
+
+3. PRECISÃO ABSOLUTA
+   - Use EXATAMENTE os valores que aparecem nos dados
+   - Não arredonde a menos que solicitado
+   - Conte manualmente quando necessário
+
+4. RESPONDA EM PORTUGUÊS BRASILEIRO
+   - Seja direto e objetivo
+   - Use formatação markdown para melhor leitura
+   - Organize respostas com bullet points quando apropriado
 
 `;
 
     if (spreadsheets && spreadsheets.length > 0) {
-      systemPrompt += `\n\n📊 DADOS DAS PLANILHAS (${spreadsheets.length} arquivo(s)):\n\n`;
+      systemPrompt += `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      systemPrompt += `📊 DADOS DAS PLANILHAS (${spreadsheets.length} arquivo(s))\n`;
+      systemPrompt += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
       
       spreadsheets.forEach((sheet: any, index: number) => {
-        systemPrompt += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-        systemPrompt += `PLANILHA ${index + 1}: ${sheet.filename}\n`;
-        systemPrompt += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-        systemPrompt += `Colunas disponíveis: ${sheet.columns.join(", ")}\n`;
-        systemPrompt += `Total de registros: ${sheet.rows.length}\n\n`;
-        systemPrompt += `DADOS COMPLETOS:\n`;
+        systemPrompt += `\n📄 PLANILHA ${index + 1}: "${sheet.filename}"\n`;
+        systemPrompt += `   └─ Colunas: ${sheet.columns.join(", ")}\n`;
+        systemPrompt += `   └─ Total de registros: ${sheet.rows.length}\n\n`;
+        systemPrompt += `DADOS COMPLETOS:\n\`\`\`json\n`;
         systemPrompt += JSON.stringify(sheet.rows, null, 2);
-        systemPrompt += `\n\n`;
+        systemPrompt += `\n\`\`\`\n\n`;
       });
       
       systemPrompt += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-      systemPrompt += `LEMBRE-SE: Use SOMENTE os dados acima. Não invente informações!\n`;
+      systemPrompt += `⚠️ LEMBRE-SE: Use EXCLUSIVAMENTE os dados acima!\n`;
+      systemPrompt += `⚠️ NÃO invente, NÃO assuma, NÃO use conhecimento externo!\n`;
       systemPrompt += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     } else {
       systemPrompt += "\n\n⚠️ NENHUMA PLANILHA CARREGADA\n\n";
@@ -69,13 +77,13 @@ COMO RESPONDER:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-5",
+        model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: systemPrompt },
           ...messages,
         ],
         stream: true,
-        max_tokens: 4096,
+        temperature: 0.1,
       }),
     });
 
