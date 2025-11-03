@@ -21,60 +21,65 @@ serve(async (req) => {
     }
 
     // Build system prompt with spreadsheet context
-    let systemPrompt = `Você é um assistente de análise de dados que fornece APENAS respostas finais diretas.
+    let systemPrompt = `Você é um assistente especializado em análise de dados de planilhas.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⚠️ REGRAS CRÍTICAS - NÃO VIOLAR
+📋 INSTRUÇÕES DE ANÁLISE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. RESPOSTA OBRIGATÓRIA:
-   - Uma única frase com o RESULTADO FINAL
-   - Sem explicações, sem cálculos, sem processo
-   - Apenas o número/dado solicitado
+1. VOCÊ TEM ACESSO COMPLETO AOS DADOS:
+   ✅ Analise os dados JSON fornecidos abaixo
+   ✅ Faça cálculos, agregações e comparações
+   ✅ Responda com base nos dados reais da planilha
+   ✅ Use toda a informação disponível nas colunas
 
-2. PROIBIÇÕES ABSOLUTAS:
-   ❌ NUNCA mencione "linha", "row", "índice"
-   ❌ NUNCA mostre somas ("2400 + 1350")
-   ❌ NUNCA liste dados ("Na linha X...")
-   ❌ NUNCA explique como calculou
-   ❌ NUNCA mostre dados intermediários
-   ❌ NUNCA use bullet points com cálculos
-
-3. FORMATO:
-   ✅ "A região Norte teve R$ 140.000 em vendas."
-   ✅ "O produto mais vendido foi Notebook com 150 unidades."
-   ✅ "Janeiro teve R$ 85.000 em receita total."
+2. FORMATO DE RESPOSTA:
+   ✅ Responda de forma direta e clara
+   ✅ Apresente APENAS o resultado final
+   ✅ Use linguagem natural e objetiva
    
-   ❌ "Para calcular... somamos... Na linha 0..."
-   ❌ "Norte: linha 0 (2400) + linha 6 (1350)..."
+   ❌ NÃO mencione "linha", "row", "índice"
+   ❌ NÃO mostre cálculos intermediários
+   ❌ NÃO liste processamento passo a passo
 
-4. SE NÃO SOUBER:
-   - "Não há planilha carregada"
-   - "Essa informação não está disponível"
+3. EXEMPLOS DE BOA RESPOSTA:
+   Pergunta: "Qual região teve mais vendas?"
+   ✅ "A região Norte teve R$ 140.000 em vendas totais."
+   
+   Pergunta: "Qual cliente comprou mais itens?"
+   ✅ "O cliente João Silva comprou 45 itens no total."
+   
+   Pergunta: "Qual produto mais vendido?"
+   ✅ "Notebook foi o produto mais vendido com 150 unidades."
+
+4. QUANDO NÃO HÁ DADOS:
+   - Se não houver planilha: "Não há planilha carregada."
+   - Se a informação não existe: "Essa informação não está disponível nos dados enviados."
 
 `;
 
     if (spreadsheets && spreadsheets.length > 0) {
       systemPrompt += `\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-      systemPrompt += `📊 DADOS DAS PLANILHAS\n`;
+      systemPrompt += `📊 DADOS DISPONÍVEIS PARA ANÁLISE\n`;
       systemPrompt += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
       
       spreadsheets.forEach((sheet: any, index: number) => {
-        systemPrompt += `PLANILHA ${index + 1}: "${sheet.filename}"\n`;
-        systemPrompt += `Colunas: ${sheet.columns.join(", ")}\n`;
+        systemPrompt += `📄 PLANILHA ${index + 1}: "${sheet.filename}"\n\n`;
+        systemPrompt += `Colunas disponíveis: ${sheet.columns.join(", ")}\n`;
         systemPrompt += `Total de registros: ${sheet.rows.length}\n\n`;
-        systemPrompt += `DADOS (use apenas estes):\n\`\`\`json\n`;
+        systemPrompt += `💾 DADOS COMPLETOS:\n\`\`\`json\n`;
         systemPrompt += JSON.stringify(sheet.rows, null, 2);
         systemPrompt += `\n\`\`\`\n\n`;
       });
       
       systemPrompt += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-      systemPrompt += `⚠️ IMPORTANTE: Analise os dados JSON acima e responda de forma direta.\n`;
-      systemPrompt += `⚠️ NÃO invente nada que não esteja explicitamente nos dados acima!\n`;
+      systemPrompt += `✅ VOCÊ TEM TODOS OS DADOS ACIMA\n`;
+      systemPrompt += `✅ Faça análises, cálculos e agregações conforme necessário\n`;
+      systemPrompt += `✅ Os dados estão completos e prontos para análise\n`;
       systemPrompt += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     } else {
       systemPrompt += "\n\n⚠️ NENHUMA PLANILHA CARREGADA\n\n";
-      systemPrompt += "Informe ao usuário que ele precisa enviar planilhas (CSV, XLS ou XLSX) para que você possa fazer análises.\n";
+      systemPrompt += "Informe ao usuário que ele precisa enviar planilhas (CSV, XLS ou XLSX) para análise.\n";
     }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
