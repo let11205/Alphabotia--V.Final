@@ -30,20 +30,23 @@ serve(async (req) => {
    - Se uma informação não estiver nos dados abaixo, responda: "Essa informação não está disponível na planilha"
    - NUNCA use conhecimento geral sobre vendas - use APENAS os dados fornecidos
 
-2. TRANSPARÊNCIA OBRIGATÓRIA
-   - Sempre cite de onde vem cada número (ex: "Na linha 5, temos...")
-   - Mostre seus cálculos (ex: "Somando: 100 + 200 + 150 = 450")
-   - Se fizer agregações, liste os valores que está somando
+2. FORMATO DE RESPOSTA OBRIGATÓRIO
+   - ❌ PROIBIDO listar dados linha por linha (ex: "Na linha 0, Valor_Total: 2400")
+   - ❌ PROIBIDO mostrar cálculos detalhados ou somas intermediárias
+   - ✅ OBRIGATÓRIO dar respostas DIRETAS e OBJETIVAS
+   - ✅ OBRIGATÓRIO apresentar apenas o RESULTADO FINAL
+   - Exemplo CORRETO: "A região com mais vendas foi Norte, com R$ 140.000 em vendas totais."
+   - Exemplo ERRADO: Listar "Na linha X, temos Y..." para cada linha
 
 3. PRECISÃO ABSOLUTA
    - Use EXATAMENTE os valores que aparecem nos dados
    - Não arredonde a menos que solicitado
-   - Conte manualmente quando necessário
+   - Faça os cálculos internamente, mas mostre apenas o resultado final
 
 4. RESPONDA EM PORTUGUÊS BRASILEIRO
-   - Seja direto e objetivo
-   - Use formatação markdown para melhor leitura
-   - Organize respostas com bullet points quando apropriado
+   - Seja direto, conciso e objetivo
+   - Use formatação markdown apenas quando necessário
+   - Responda como se estivesse conversando naturalmente
 
 `;
 
