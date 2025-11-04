@@ -16,12 +16,28 @@ serve(async (req) => {
   try {
     const { messages, spreadsheets } = await req.json();
 
+    console.log("📊 Recebendo requisição de análise");
+    console.log("📁 Número de planilhas:", spreadsheets?.length || 0);
+    
+    if (spreadsheets && spreadsheets.length > 0) {
+      spreadsheets.forEach((sheet: any, idx: number) => {
+        console.log(`\n📄 Planilha ${idx + 1}:`, sheet.filename);
+        console.log("  └─ Colunas:", sheet.columns);
+        console.log("  └─ Total de linhas:", sheet.rows?.length || 0);
+        console.log("  └─ Primeiras 3 linhas:", JSON.stringify(sheet.rows?.slice(0, 3), null, 2));
+      });
+    }
+
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY não configurada");
     }
 
     // Build system prompt with spreadsheet context
     let systemPrompt = `Você é um BOT ANALÍTICO de planilhas. Sua função é analisar com exatidão e transparência os dados enviados e responder com base em CÁLCULOS REAIS.
+
+⚠️ ATENÇÃO CRÍTICA: VOCÊ DEVE PROCESSAR OS DADOS JSON FORNECIDOS E FAZER CÁLCULOS REAIS.
+NÃO INVENTE NÚMEROS. NÃO ADIVINHE. CALCULE A PARTIR DOS DADOS JSON.
+TODOS OS NÚMEROS NA SUA RESPOSTA DEVEM VIR DE OPERAÇÕES MATEMÁTICAS SOBRE OS DADOS.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📋 REGRAS FUNDAMENTAIS
@@ -119,16 +135,31 @@ serve(async (req) => {
         systemPrompt += `📄 PLANILHA ${index + 1}: "${sheet.filename}"\n\n`;
         systemPrompt += `Colunas disponíveis: ${sheet.columns.join(", ")}\n`;
         systemPrompt += `Total de registros: ${sheet.rows.length}\n\n`;
-        systemPrompt += `💾 DADOS COMPLETOS:\n\`\`\`json\n`;
+        systemPrompt += `💾 DADOS COMPLETOS EM JSON (USE ESTES DADOS PARA CALCULAR):\n\`\`\`json\n`;
         systemPrompt += JSON.stringify(sheet.rows, null, 2);
         systemPrompt += `\n\`\`\`\n\n`;
+        systemPrompt += `⚠️ INSTRUÇÕES DE CÁLCULO:\n`;
+        systemPrompt += `1. Leia o JSON acima linha por linha\n`;
+        systemPrompt += `2. Para cada linha, extraia os valores das colunas relevantes\n`;
+        systemPrompt += `3. Some/conte/agrupe conforme a pergunta\n`;
+        systemPrompt += `4. Mostre na resposta COMO você chegou aos números\n`;
+        systemPrompt += `5. NUNCA invente números que não venham destes dados\n\n`;
       });
       
       systemPrompt += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-      systemPrompt += `✅ VOCÊ TEM TODOS OS DADOS ACIMA\n`;
-      systemPrompt += `✅ Faça análises, cálculos e agregações conforme necessário\n`;
-      systemPrompt += `✅ Os dados estão completos e prontos para análise\n`;
+      systemPrompt += `✅ VOCÊ TEM TODOS OS DADOS JSON ACIMA\n`;
+      systemPrompt += `✅ PROCESSE CADA LINHA DO JSON E FAÇA OS CÁLCULOS\n`;
+      systemPrompt += `✅ MOSTRE O PASSO A PASSO DOS CÁLCULOS\n`;
+      systemPrompt += `✅ VALIDE OS RESULTADOS ANTES DE RESPONDER\n`;
       systemPrompt += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      systemPrompt += `\n🔍 EXEMPLO DE COMO CALCULAR:\n`;
+      systemPrompt += `Se a pergunta for "Qual cliente comprou mais em quantidade?":\n`;
+      systemPrompt += `1. Percorra todas as linhas do JSON\n`;
+      systemPrompt += `2. Para cada linha, pegue o valor da coluna "Cliente" e "Quantidade"\n`;
+      systemPrompt += `3. Agrupe por Cliente e some as quantidades\n`;
+      systemPrompt += `4. Ordene do maior para o menor\n`;
+      systemPrompt += `5. Retorne o cliente com maior total\n`;
+      systemPrompt += `6. Mostre a tabela com os Top 5 para transparência\n\n`;
     } else {
       systemPrompt += "\n\n⚠️ NENHUMA PLANILHA CARREGADA\n\n";
       systemPrompt += "Informe ao usuário que ele precisa enviar planilhas (CSV, XLS ou XLSX) para análise.\n";
