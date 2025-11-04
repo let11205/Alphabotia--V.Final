@@ -30,11 +30,47 @@ export const ChatMessage = ({ message, isBot, timestamp }: ChatMessageProps) => 
             : "bg-gradient-primary text-primary-foreground"
         )}
       >
-        <div className="text-sm leading-relaxed prose prose-sm max-w-none prose-invert prose-p:my-2 prose-ul:my-2 prose-li:my-1">
+        <div className={cn(
+          "text-sm leading-relaxed prose prose-sm max-w-none",
+          isBot 
+            ? "prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-li:text-foreground prose-td:text-foreground prose-th:text-foreground prose-code:text-foreground prose-blockquote:text-muted-foreground prose-hr:border-border" 
+            : ""
+        )}>
           {isBot ? (
-            <ReactMarkdown>{message}</ReactMarkdown>
+            <ReactMarkdown
+              components={{
+                table: ({ node, ...props }) => (
+                  <div className="overflow-x-auto my-4">
+                    <table className="w-full border-collapse border border-border rounded-lg" {...props} />
+                  </div>
+                ),
+                th: ({ node, ...props }) => (
+                  <th className="border border-border bg-muted px-4 py-2 text-left font-semibold" {...props} />
+                ),
+                td: ({ node, ...props }) => (
+                  <td className="border border-border px-4 py-2" {...props} />
+                ),
+                h2: ({ node, ...props }) => (
+                  <h2 className="text-lg font-bold mt-6 mb-3 flex items-center gap-2" {...props} />
+                ),
+                h3: ({ node, ...props }) => (
+                  <h3 className="text-base font-semibold mt-4 mb-2" {...props} />
+                ),
+                code: ({ node, inline, ...props }: any) => 
+                  inline ? (
+                    <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono" {...props} />
+                  ) : (
+                    <code className="block bg-muted p-3 rounded-lg text-sm font-mono overflow-x-auto" {...props} />
+                  ),
+                hr: ({ node, ...props }) => (
+                  <hr className="my-6 border-border" {...props} />
+                ),
+              }}
+            >
+              {message}
+            </ReactMarkdown>
           ) : (
-            <p className="whitespace-pre-wrap">{message}</p>
+            <p className="whitespace-pre-wrap text-primary-foreground">{message}</p>
           )}
         </div>
         {timestamp && (
