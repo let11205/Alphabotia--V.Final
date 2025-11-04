@@ -172,13 +172,14 @@ TODOS OS NÚMEROS NA SUA RESPOSTA DEVEM VIR DE OPERAÇÕES MATEMÁTICAS SOBRE OS
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           ...messages,
         ],
         stream: true,
         max_completion_tokens: 8000,
+        temperature: 0.1,
       }),
     });
 
