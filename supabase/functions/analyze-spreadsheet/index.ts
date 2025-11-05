@@ -68,27 +68,18 @@ PASSO 4: VALIDAR MATEMÁTICA
 - Compare com soma total esperada
 - Se diferença > 0, MOSTRE ERRO
 
-PASSO 5: EXIBIR CÁLCULO DETALHADO (OBRIGATÓRIO)
+PASSO 5: EXIBIR RESULTADO (NÃO MOSTRE DADOS BRUTOS)
 
-Formato de resposta:
+Formato de resposta OBRIGATÓRIO:
 
 ## 🎯 Pergunta
 <repita a pergunta>
 
-## 📊 Dados Processados
-- **Planilhas:** <nomes>
-- **Total de linhas:** <N>
-- **Colunas usadas:** \`<X>\`, \`<Y>\`
-
-## 🧮 Cálculo Passo a Passo
-
-Exemplo de processamento (mostre pelo menos 3 linhas):
-
-Linha 1: Cliente="João" → Quantidade=10 → total["João"] = 10
-Linha 2: Cliente="Maria" → Quantidade=5 → total["Maria"] = 5  
-Linha 3: Cliente="João" → Quantidade=3 → total["João"] = 13
-...
-Resultado final: {"João": 13, "Maria": 5, ...}
+## 📊 Resumo do Processamento
+- **Planilha analisada:** <nome>
+- **Total de registros processados:** <N>
+- **Método:** <descreva em 1 frase o que foi feito, ex: "Agrupamento por cliente e soma de quantidades">
+- **Colunas utilizadas:** \`<X>\`, \`<Y>\`
 
 ## 📊 Top 5 Resultados
 
@@ -119,34 +110,22 @@ Resultado final: {"João": 13, "Maria": 5, ...}
       systemPrompt += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
       
       spreadsheets.forEach((sheet: any, index: number) => {
-        systemPrompt += `📄 PLANILHA ${index + 1}: "${sheet.filename}"\n\n`;
-        systemPrompt += `Colunas disponíveis: ${sheet.columns.join(", ")}\n`;
+        systemPrompt += `📄 PLANILHA ${index + 1}: "${sheet.filename}"\n`;
+        systemPrompt += `Colunas: ${sheet.columns.join(", ")}\n`;
         systemPrompt += `Total de registros: ${sheet.rows.length}\n\n`;
-        systemPrompt += `💾 DADOS COMPLETOS EM JSON (USE ESTES DADOS PARA CALCULAR):\n\`\`\`json\n`;
+        systemPrompt += `💾 DADOS EM JSON (PROCESSE ESTES DADOS - NÃO MOSTRE NA RESPOSTA):\n\`\`\`json\n`;
         systemPrompt += JSON.stringify(sheet.rows, null, 2);
         systemPrompt += `\n\`\`\`\n\n`;
-        systemPrompt += `⚠️ INSTRUÇÕES DE CÁLCULO:\n`;
-        systemPrompt += `1. Leia o JSON acima linha por linha\n`;
-        systemPrompt += `2. Para cada linha, extraia os valores das colunas relevantes\n`;
-        systemPrompt += `3. Some/conte/agrupe conforme a pergunta\n`;
-        systemPrompt += `4. Mostre na resposta COMO você chegou aos números\n`;
-        systemPrompt += `5. NUNCA invente números que não venham destes dados\n\n`;
       });
       
       systemPrompt += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-      systemPrompt += `✅ VOCÊ TEM TODOS OS DADOS JSON ACIMA\n`;
-      systemPrompt += `✅ PROCESSE CADA LINHA DO JSON E FAÇA OS CÁLCULOS\n`;
-      systemPrompt += `✅ MOSTRE O PASSO A PASSO DOS CÁLCULOS\n`;
-      systemPrompt += `✅ VALIDE OS RESULTADOS ANTES DE RESPONDER\n`;
-      systemPrompt += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-      systemPrompt += `\n🔍 EXEMPLO DE COMO CALCULAR:\n`;
-      systemPrompt += `Se a pergunta for "Qual cliente comprou mais em quantidade?":\n`;
-      systemPrompt += `1. Percorra todas as linhas do JSON\n`;
-      systemPrompt += `2. Para cada linha, pegue o valor da coluna "Cliente" e "Quantidade"\n`;
-      systemPrompt += `3. Agrupe por Cliente e some as quantidades\n`;
-      systemPrompt += `4. Ordene do maior para o menor\n`;
-      systemPrompt += `5. Retorne o cliente com maior total\n`;
-      systemPrompt += `6. Mostre a tabela com os Top 5 para transparência\n\n`;
+      systemPrompt += `⚠️ REGRAS DE RESPOSTA:\n`;
+      systemPrompt += `1. NÃO mostre os dados JSON na resposta\n`;
+      systemPrompt += `2. NÃO mostre linhas individuais da planilha\n`;
+      systemPrompt += `3. MOSTRE apenas: resumo do processamento + tabela de resultados + resposta final\n`;
+      systemPrompt += `4. Use os dados acima INTERNAMENTE para calcular\n`;
+      systemPrompt += `5. Apresente apenas os RESULTADOS FINAIS de forma limpa e visual\n`;
+      systemPrompt += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
     } else {
       systemPrompt += "\n\n⚠️ NENHUMA PLANILHA CARREGADA\n\n";
       systemPrompt += "Informe ao usuário que ele precisa enviar planilhas (CSV, XLS ou XLSX) para análise.\n";
