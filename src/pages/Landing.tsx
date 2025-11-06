@@ -65,7 +65,7 @@ const Landing = () => {
             size="lg"
             className="bg-gradient-primary text-primary-foreground hover:opacity-90 transition-all text-lg px-8 py-6 rounded-2xl shadow-glow hover:shadow-lg group"
           >
-            Ir para o Chat
+            Começar
             <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
